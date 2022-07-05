@@ -1,7 +1,11 @@
+let toScreen = "0";
+
 let num1_str = "0", num2_str = null;
+let operator = "add";
 
 let operatorButtons = document.querySelectorAll(".operator");
-operatorButtons.forEach(x => x.addEventListener('mousedown', e => operate(num1_str, num2_str, e.target.classList[0])));
+operatorButtons.forEach(x => x.addEventListener('mousedown', e => {operate(num1_str, num2_str, operator);
+                                                                   operator = e.target.classList[0];}));
 
 let numberButtons = document.querySelectorAll(".number");
 numberButtons.forEach(x => x.addEventListener('mousedown', e => inputNum(e.target.classList[0])));
@@ -21,12 +25,14 @@ let operators = {
 function reset() {
     num1_str = "0";
     num2_str = null;
+    operator = "add";
+    toScreen = num1_str;
     updateScreen();
 }
 
 function updateScreen() {
     // Make decimals and stuff shorter
-    screen.textContent = num2_str;
+    screen.textContent = toScreen;
 }
 
 
@@ -34,7 +40,7 @@ function inputNum(num) {
     if (num2_str === null) num2_str = "";
     if (num2_str.length >= 9) return;
     num2_str += num; 
-    console.log(num2_str);
+    toScreen = num2_str;
     updateScreen();
 }
 
@@ -52,8 +58,12 @@ function divide(num1, num2) {
     return num1 / num2;
 }
 function equals(num1, num2) {
-    return num1;
+    if (num2_str === null) return;
+    num1_str = "0";
+    num2_str = null;
+    return num2;
 }
+
 
 function operate(num1, num2, operator) {
     if (num2_str === null) return;
@@ -61,10 +71,11 @@ function operate(num1, num2, operator) {
     num1 = +num1;
     num2 = +num2;
 
-    let newVal = operators[operator];
-
-    console.log(newVal);
-    screen.textContent = num1_str;
+    num1_str = operators[operator](num1, num2);
+    num2_str = null;
+    
+    toScreen = num1_str;
+    updateScreen();
 }
 
 reset();

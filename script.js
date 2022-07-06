@@ -3,7 +3,8 @@ let toScreen = "0";
 let num1_str = "0", num2_str = null;
 let operator = "add";
 
-let hasDec = false;
+let hasDec = false, hasNeg = false;
+let lock = false;
 
 let operatorButtons = document.querySelectorAll(".operator");
 operatorButtons.forEach(x => x.addEventListener('mousedown', e => {operate(num1_str, num2_str, operator);
@@ -16,7 +17,7 @@ let specialButton = document.querySelector(".AC");
 specialButton.addEventListener('mousedown', ()=>reset());
 
 specialButton = document.querySelector(".pm")
-specialButton.addEventListener('mousedown', ()=>{toScreen = num2_str=(+num2_str*(-1)).toString(); updateScreen();});
+specialButton.addEventListener('mousedown', ()=>pm());
 
 specialButton = document.querySelector(".E");
 specialButton.addEventListener('mousedown', () => E());
@@ -45,19 +46,32 @@ function reset() {
     num1_str = "0";
     num2_str = null;
     operator = "add";
+    hasDec = hasNeg = false;
+    lock = false;
     toScreen = num1_str;
     updateScreen();
 }
 
 function updateScreen() {
-    // Make decimals and stuff shorter
+    if (lock) return;
+    subNeg = (toScreen.indexOf('-') != -1) ? 1 : 0;
+    subDec = (toScreen.indexOf('.') != -1) ? 1 : 0;
+
+    if (toScreen.length - subNeg - subDec > 9) {
+        if (toScreen.indexOf('.') != -1) toScreen = +(+toScreen).toFixed(((toScreen.length < 10) ? toScreen.length : 10) - 1 - toScreen.indexOf('.') + subNeg);
+        else {
+            toScreen = toScreen[0] + `e${toScreen.length - 1}`;
+            lock = true;
+        }   
+    }
     screen.textContent = toScreen;
 }
 
 
 function inputNum(num) {
-    if (num2_str === null) num2_str = "";
-    if (num2_str.length >= 10 || (!hasDec && num2_str.length >= 9)) return;
+    if (lock) return;
+    if (num2_str === null || num2_str == "0") num2_str = "";
+    if (num2_str.length >= 10 || ((!hasDec && !hasNeg) && num2_str.length >= 9)) return;
     num2_str += num; 
     toScreen = num2_str;
     updateScreen();
@@ -83,31 +97,49 @@ function equals(num1, num2) {
 
 
 function operate(num1, num2, operator) {
-    if (num2_str === null) return;
+    if (num2_str === null || lock) return;
 
     hasDec = false;
+    hasNeg = false;
 
     num1 = +num1;
     num2 = +num2;
 
-    num1_str = operators[operator](num1, num2);
+    num1_str = operators[operator](num1, num2).toString();
     num2_str = null;
+
+    if (+num1_str < 0) hasNeg = true;
     
     toScreen = num1_str;
     updateScreen();
 }
 
 function addDecimal() {
-    if (hasDec) return;
+    if (hasDec || lock) return;
     if (num2_str == null) num2_str = "0";
+    if ((num2_str.length >= 10 && hasNeg) || num2_str.length >= 9) return;
     toScreen = num2_str += ".";
     hasDec = true;
     updateScreen();
 }
 
+
+function pm() {
+    if (lock) return;
+    if (num2_str === null) {
+        toScreen = num1_str=(+num1_str*(-1)).toString();
+        updateScreen();
+        return;
+    }
+    toScreen = num2_str=(+num2_str*(-1)).toString(); updateScreen();
+    hasNeg = !hasNeg;
+}
+
 function backspace() {
-    if (num2_str.length <= 0) return;
+    if (lock || num2_str === null || num2_str.length <= 0) return;
+    if (num2_str[num2_str.length - 1] == '.') hasDec = false;
     toScreen = num2_str = num2_str.length > 1 ? num2_str.substring(0, num2_str.length - 1) : "0";
+    if (num2_str == '-') toScreen = num2_str = "0";
     updateScreen();
 }
 

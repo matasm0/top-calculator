@@ -105,7 +105,14 @@ function operate(num1, num2, operator) {
     num1 = +num1;
     num2 = +num2;
 
-    num1_str = operators[operator](num1, num2).toString();
+    num1_str = operators[operator](num1, num2);
+    if (num1_str == null) {
+        reset();
+        lock = true;
+        screen.textContent = "Oops!";
+    }
+
+    num1_str = num1_str.toString();
     num2_str = null;
 
     if (+num1_str < 0) hasNeg = true;
@@ -146,6 +153,7 @@ function backspace() {
 function E() {
     reset();
     screen.textContent = "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE";
+    lock = true;
 }
 
 reset();

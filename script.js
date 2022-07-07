@@ -28,6 +28,9 @@ specialButton.addEventListener('mousedown', () => addDecimal());
 specialButton = document.querySelector(".backspace");
 specialButton.addEventListener('mousedown', () => backspace());
 
+let html = document.querySelector("html");
+html.addEventListener("keypress", e => keyboardInput(e));
+
 
 
 let screen = document.querySelector(".screen");
@@ -162,6 +165,30 @@ function E() {
     reset();
     screen.textContent = "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE";
     lock = true;
+}
+
+function keyboardInput(event) {
+    let validKeys = {
+        '1': () => inputNum(1), 
+        '2': () => inputNum(2), 
+        '3': () => inputNum(3), 
+        '4': () => inputNum(4), 
+        '5': () => inputNum(5), 
+        '6': () => inputNum(6), 
+        '7': () => inputNum(7), 
+        '8': () => inputNum(8), 
+        '9': () => inputNum(9), 
+        '0': () => inputNum(0), 
+        '.': () => addDecimal(), 
+        '/': () => operate(num1_str, num2_str, "divide"), 
+        '*': () => operate(num1_str, num2_str, "multiply"), 
+        '+': () => operate(num1_str, num2_str, "add"),
+        '-': () => operate(num1_str, num2_str, "subtract"), 
+        'E': () => E()};
+
+    if (event.key in validKeys) {
+        validKeys[event.key]();
+    }
 }
 
 reset();

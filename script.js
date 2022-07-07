@@ -71,7 +71,8 @@ function updateScreen() {
 function inputNum(num) {
     if (lock) return;
     if (num2_str === null || num2_str == "0") num2_str = "";
-    if (num2_str.length >= 10 || ((!hasDec && !hasNeg) && num2_str.length >= 9)) return;
+    if (num2_str.length - hasNeg - hasDec >= 9) return;
+
     num2_str += num; 
     toScreen = num2_str;
     updateScreen();
@@ -138,7 +139,11 @@ function pm() {
         updateScreen();
         return;
     }
-    toScreen = num2_str=(+num2_str*(-1)).toString(); updateScreen();
+    
+    num2_str = (+num2_str*(-1)).toString(); 
+    if (hasDec) num2_str += '.';
+    toScreen = num2_str;
+    updateScreen();
     hasNeg = !hasNeg;
 }
 
@@ -146,7 +151,10 @@ function backspace() {
     if (lock || num2_str === null || num2_str.length <= 0) return;
     if (num2_str[num2_str.length - 1] == '.') hasDec = false;
     toScreen = num2_str = num2_str.length > 1 ? num2_str.substring(0, num2_str.length - 1) : "0";
-    if (num2_str == '-') toScreen = num2_str = "0";
+    if (num2_str == '-') {
+        toScreen = num2_str = "0";
+        hasNeg = false;
+    }
     updateScreen();
 }
 
